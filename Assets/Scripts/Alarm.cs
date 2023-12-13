@@ -9,38 +9,41 @@ public class Alarm : MonoBehaviour
     [SerializeField] private AudioSource _alarmSound;
     [SerializeField] private float _fadeTime;
 
-    private void Start()
-    {
-        _alarmSound = GetComponent<AudioSource>();
-    }
+    private bool _isFadingIn = false;
+    private bool _isFadingOut = false;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent<Player>(out _))
-            StartCoroutine(FadeInAlarm());
+        {
+            _isFadingIn = true;
+            _isFadingOut = false;
+            StartCoroutine(FadeAlarm());
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent<Player>(out _))
-            StartCoroutine(FadeOutAlarm());
-    }
-
-    private IEnumerator FadeInAlarm()
-    {
-        while (_alarmSound.volume < MaxValueSound)
         {
-            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, MaxValueSound, Time.deltaTime / _fadeTime);
-
-            yield return null;
+            _isFadingOut = true;
+            _isFadingIn = false;
+            StartCoroutine(FadeAlarm());
         }
     }
 
-    private IEnumerator FadeOutAlarm()
+    private IEnumerator FadeAlarm()
     {
-        while (_alarmSound.volume > MinValueSound)
+        while (_isFadingIn && _alarmSound.volume < MaxValueSound || _isFadingOut && _alarmSound.volume > MinValueSound)
         {
-            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, MinValueSound, Time.deltaTime / _fadeTime);
+            if (_isFadingIn)
+            {
+                _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, MaxValueSound, Time.deltaTime / _fadeTime);
+            }
+            else if (_isFadingOut)
+            {
+                _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, MinValueSound, Time.deltaTime / _fadeTime);
+            }
 
             yield return null;
         }
