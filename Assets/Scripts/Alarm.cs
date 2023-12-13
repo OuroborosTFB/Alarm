@@ -9,20 +9,15 @@ public class Alarm : MonoBehaviour
     [SerializeField] private AudioSource _alarmSound;
     [SerializeField] private float _fadeTime;
 
-    private void OnTriggerEnter(Collider other)
+
+    public void ActivateAlarm()
     {
-        if (other.TryGetComponent<Player>(out _))
-        {
-            StartCoroutine(FadeAlarm(MaxValueSound));
-        }
+        StartCoroutine(FadeAlarm(MaxValueSound));
     }
 
-    private void OnTriggerExit(Collider other)
+    public void DeactivateAlarm()
     {
-        if (other.TryGetComponent<Player>(out _))
-        {
-            StartCoroutine(FadeAlarm(MinValueSound));
-        }
+        StartCoroutine(FadeAlarm(MinValueSound));
     }
 
     private IEnumerator FadeAlarm(float targetVolume)
@@ -31,13 +26,6 @@ public class Alarm : MonoBehaviour
         {
             _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, targetVolume, Time.deltaTime / _fadeTime);
             yield return null;
-        }
-
-        _alarmSound.volume = targetVolume;
-
-        if (Mathf.Approximately(targetVolume, MinValueSound))
-        {
-            _alarmSound.Stop();
         }
     }
 }
