@@ -3,22 +3,16 @@ using UnityEngine;
 
 public class Alarm : MonoBehaviour
 {
-    private const float MaxValueSound = 1.0f;
     private const float MinValueSound = 0.0f;
 
     [SerializeField] private AudioSource _alarmSound;
     [SerializeField] private float _fadeTime;
 
-    private bool _isFadingIn = false;
-    private bool _isFadingOut = false;
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent<Player>(out _))
         {
-            _isFadingIn = true;
-            _isFadingOut = false;
-            StartCoroutine(FadeAlarm());
+            StartCoroutine(FadeAlarm(1.0f));
         }
     }
 
@@ -26,25 +20,15 @@ public class Alarm : MonoBehaviour
     {
         if (other.TryGetComponent<Player>(out _))
         {
-            _isFadingOut = true;
-            _isFadingIn = false;
-            StartCoroutine(FadeAlarm());
+            StartCoroutine(FadeAlarm(MinValueSound));
         }
     }
 
-    private IEnumerator FadeAlarm()
+    private IEnumerator FadeAlarm(float targetVolume)
     {
-        while (_isFadingIn && _alarmSound.volume < MaxValueSound || _isFadingOut && _alarmSound.volume > MinValueSound)
+        while (!Mathf.Approximately(_alarmSound.volume, targetVolume))
         {
-            if (_isFadingIn)
-            {
-                _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, MaxValueSound, Time.deltaTime / _fadeTime);
-            }
-            else if (_isFadingOut)
-            {
-                _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, MinValueSound, Time.deltaTime / _fadeTime);
-            }
-
+            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, targetVolume, Time.deltaTime / _fadeTime);
             yield return null;
         }
     }
