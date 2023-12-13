@@ -624,7 +624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _alarmSound: {fileID: 1808183584}
-  _fadeTime: 10
+  _fadeTime: 1
 --- !u!1 &1996874327
 GameObject:
   m_ObjectHideFlags: 0
